@@ -25,7 +25,7 @@ class OpencvIo:
         except IOError:
             raise
         except:
-            print 'Arugment Error : Something wrong'
+            print 'Argument Error : Something wrong while reading image'
             sys.exit()
         return src
 

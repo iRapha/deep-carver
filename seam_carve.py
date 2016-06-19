@@ -52,7 +52,9 @@ import numpy
 from math import fabs
 import sys
 from saliency_map import SaliencyMap
+from utils import OpencvIo
 
+io = OpencvIo()
 
 inf = 1e1000
 verbose = False
