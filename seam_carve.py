@@ -384,7 +384,14 @@ def saliency_filter(input_img):
   sm = SaliencyMap(input_img)
   return sm.map
 
-def CAIS(input_img, resolution, output, mark):
+def get_energy_model(inp, options=None):
+  if options == "lame_old_version":
+    return gradient_filter(grayscale_filter(inp))
+  return merge_filters(
+    gradient_filter(grayscale_filter(inp)),
+    saliency_filter(inp))
+
+def CAIS(input_img, resolution, output, mark, options=None):
   """
   The main controller method
   @input_img: the file name of the input_img
@@ -397,38 +404,32 @@ def CAIS(input_img, resolution, output, mark):
   im_width, im_height = input.size
   marked = [ ]
 
+  if options == "energy":
+    mode_saved = input.mode
+    input = get_energy_model(input, options).convert(mode_saved)
+    input.save(output, "JPEG")
+    return
+
   while im_width > resolution[0]:
-    u = find_vertical_seam(
-      merge_filters(
-        gradient_filter(grayscale_filter(input)),
-        saliency_filter(input)))
+    u = find_vertical_seam(get_energy_model(input, options))
     if mark:
       marked.append(u)
     input = delete_vertical_seam(input, u)
     im_width = input.size[0]
 
   while im_width < resolution[0]:
-    u = find_vertical_seam(
-      merge_filters(
-        gradient_filter(grayscale_filter(input)),
-        saliency_filter(input)))
+    u = find_vertical_seam(get_energy_model(input, options))
     input = add_vertical_seam(input, u)
     im_width = input.size[0]
 
   while im_height > resolution[1]:
-    v = find_horizontal_seam(
-      merge_filters(
-        gradient_filter(grayscale_filter(input)),
-        saliency_filter(input)))
+    v = find_horizontal_seam(get_energy_model(input, options))
     if mark:
       marked.append(v)
     input = delete_horizontal_seam(input,v)
     im_height = input.size[1]
   while im_height < resolution[1]:
-    v = find_horizontal_seam(
-      merge_filters(
-        gradient_filter(grayscale_filter(input)),
-        saliency_filter(input)))
+    v = find_horizontal_seam(get_energy_model(input, options))
     input = add_horizontal_seam(input,v)
     im_height = input.size[1]
 
@@ -460,6 +461,8 @@ def main():
   parser.add_option("-o", "--output", dest="output", help="Output Image File Name")
   parser.add_option("-v", "--verbose", dest="verbose", help="Trigger Verbose Printing", action="store_true")
   parser.add_option("-m", "--mark", dest="mark", help="Mark Seams Targeted. Only works for deleting", action="store_true")
+  parser.add_option("-l", "--lame", dest="lame", help="Uses version of energy activation that don't include sliency mapping.")
+  parser.add_option("-e", "--energy", dest="energy", help="Just saves the energy model with saliency mapping.")
   (options, args) = parser.parse_args()
   if not options.input_image or not options.resolution:
     print "Incorrect Usage; please see python CAIS.py --help"
@@ -475,6 +478,10 @@ def main():
     mark = True
   else:
     mark = False
+  if options.lame:
+    opt = "lame_old_version"
+  if options.energy:
+    opt = "energy"
   try:
     input_image = options.input_image
     resolution = ( int(options.resolution[0]), int(options.resolution[1]) )
@@ -482,7 +489,7 @@ def main():
     print "Incorrect Usage; please see python CAIS.py --help"
     sys.exit(2)
 
-  CAIS(input_image, resolution, output, mark)
+  CAIS(input_image, resolution, output, mark, opt)
 
 
 if __name__ == "__main__":
