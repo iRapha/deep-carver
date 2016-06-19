@@ -73,8 +73,10 @@ def get_scsm_filename(filename):
     return os.path.join(app.config['UPLOAD_FOLDER'], filename, 'scsm.jpg')
 
 def start_stuff(filename, resolution):
-    p = Process(target=do_image_stuff, args=(filename, resolution))
-    p.start()
+    # p = Process(target=do_image_stuff, args=(filename, resolution))
+    # p.start()
+    print "do stuff go"
+    do_image_stuff(filename, resolution)
 
 def do_image_stuff(filename, resolution):
     dirname = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -88,19 +90,25 @@ def do_image_stuff(filename, resolution):
     og_filename = get_og_filename(filename)
 
     ## seam carver
-    p_sc = Process(target=do_sc, args=(filename, resolution))
-    p_sc.start()
+    # p_sc = Process(target=do_sc, args=(filename, resolution))
+    # p_sc.start()
     ## saliency map
-    p_sm = Process(target=do_sm, args=(filename, resolution))
-    p_sm.start()
-    ## seam carver with saliency map
-    p_scsm = Process(target=do_scsm, args=(filename, resolution))
-    p_scsm.start()
+    # p_sm = Process(target=do_sm, args=(filename, resolution))
+    # p_sm.start()
+    # ## seam carver with saliency map
+    # p_scsm = Process(target=do_scsm, args=(filename, resolution))
+    # p_scsm.start()
+    print "start"
+    do_sc(filename, resolution)
+    print "start"
+    do_sm(filename, resolution)
+    print "start"
+    do_scsm(filename, resolution)
 
     print 'joins'
-    p_sc.join()
-    p_sm.join()
-    p_scsm.join()
+    # p_sc.join()
+    # p_sm.join()
+    # p_scsm.join()
 
     ## delete in progress file
     os.remove(status_filename)
@@ -111,7 +119,7 @@ def do_sc(filename, resolution):
         return
     og_filename = get_og_filename(filename)
     print 'seam carver start'
-    CAIS(og_filename, resolution, sc_filename, 'lame_old_version')
+    CAIS(og_filename, resolution, sc_filename, False, 'lame_old_version')
     print 'sc done'
     return
 
@@ -121,7 +129,7 @@ def do_sm(filename, resolution):
         return
     og_filename = get_og_filename(filename)
     print 'saliency map start'
-    CAIS(og_filename, resolution, sm_filename, 'energy')
+    CAIS(og_filename, resolution, sm_filename, False, 'energy')
     print 'sm done'
     return
 
@@ -131,7 +139,7 @@ def do_scsm(filename, resolution):
         return
     og_filename = get_og_filename(filename)
     print 'good start'
-    CAIS(og_filename, resolution, scsm_filename, None)
+    CAIS(og_filename, resolution, scsm_filename, False)
     print 'good done'
     return
 
