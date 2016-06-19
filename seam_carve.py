@@ -488,6 +488,8 @@ def main():
     opt = "lame_old_version"
   if options.energy:
     opt = "energy"
+  else:
+    opt = None
   try:
     input_image = options.input_image
     resolution = ( int(options.resolution[0]), int(options.resolution[1]) )
