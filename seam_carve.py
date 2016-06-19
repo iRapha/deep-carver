@@ -51,32 +51,29 @@ from scipy.ndimage.filters import generic_gradient_magnitude, sobel
 import numpy
 from math import fabs
 import sys
+from saliency_map import SaliencyMap
 
 
 inf = 1e1000
 verbose = False
 
-def print_fn( s ):
-
+def print_fn(s):
   """
   prints diagnostic messages if the verbose option has been enabled
   @s: string s to print
   """
-
   global verbose
   if verbose:
     print s
 
-def grayscale_filter ( img ):
-
+def grayscale_filter(img):
   """
   Takes an image and returns a grayscale image using floats
   @img: the input img
   """
   return img.convert("F")
 
-def slow_gradient_filter ( img ):
-
+def slow_gradient_filter(img):
   """
   Takes a grayscale img and returns the magnitude of the gradient operator on the image. Implements the Sobel operator.
   See http://en.wikipedia.org/wiki/Sobel_operator for details on the Sobel operator
@@ -99,8 +96,8 @@ def slow_gradient_filter ( img ):
       output[x,y] = fabs(dx) + fabs(dy)
 
   return gradient
-def gradient_filter ( im ):
 
+def gradient_filter(im):
   """
   Takes a grayscale img and retuns the Sobel operator on the image. Fast thanks to Scipy/Numpy. See slow_gradient_filter for
   an implementation of what the Sobel operator is doing
@@ -115,12 +112,10 @@ def gradient_filter ( im ):
   return gradient
 
 def img_transpose(im):
-
   """
   Returns the transpose of the Image object
   @img: input image
   """
-
   im_width, im_height = im.size
   cost = numpy.zeros( im.size )
   im_arr = numpy.reshape( im.getdata( ), (im_height, im_width) )
@@ -129,16 +124,13 @@ def img_transpose(im):
   im.putdata( list( im_arr.flat) )
   return im
 
-
-def find_horizontal_seam ( im ):
-
+def find_horizontal_seam(im):
   """
   Takes a grayscale img and returns the lowest energy horizontal seam as a list of pixels (2-tuples).
   This implements the dynamic programming seam-find algorithm. For an m*n picture, this algorithm
   takes O(m*n) time
   @im: a grayscale image
   """
-
   im_width, im_height = im.size
 
   cost = numpy.zeros( im.size )
@@ -201,15 +193,13 @@ def find_horizontal_seam ( im ):
   print_fn( "Reconstruction Complete." )
   return path
 
-def find_vertical_seam ( im ):
-
+def find_vertical_seam(im):
   """
   Takes a grayscale img and returns the lowest energy vertical seam as a list of pixels (2-tuples).
   This implements the dynamic programming seam-find algorithm. For an m*n picture, this algorithm
   takes O(m*n) time
   @im: a grayscale image
   """
-
   im = img_transpose(im)
   u = find_horizontal_seam(im)
   for i in range(len(u)):
@@ -218,8 +208,7 @@ def find_vertical_seam ( im ):
     u[i] = tuple(temp)
   return u
 
-def mark_seam (img, path):
-
+def mark_seam(img, path):
   """
   Marks a seam for easy visual checking
   @img: an input img
@@ -239,8 +228,7 @@ def mark_seam (img, path):
   return img
 
 
-def delete_horizontal_seam (img, path):
-
+def delete_horizontal_seam(img, path):
   """
   Deletes the pixels in a horizontal path from img
   @img: an input img
@@ -267,8 +255,7 @@ def delete_horizontal_seam (img, path):
   return i
 
 
-def delete_vertical_seam (img, path):
-
+def delete_vertical_seam(img, path):
   """
   Deletes the pixels in a vertical path from img
   @img: an input img
@@ -300,7 +287,6 @@ def add_vertical_seam(img, path):
   @img: an input img
   @path: pixels to delete in a vertical path
   """
-
   print_fn( "Adding Vertical Seam..." )
   img_width, img_height = img.size
   i = Image.new(img.mode, (img_width + 1, img_height) )
@@ -326,7 +312,6 @@ def add_vertical_seam(img, path):
   return i
 
 def add_horizontal_seam(img, path):
-
   """
   Adds the pixels in a horizontal path from img
   @img: an input img
@@ -356,8 +341,7 @@ def add_horizontal_seam(img, path):
   print_fn( "Addition Complete." )
   return i
 
-def vector_avg (u, v):
-
+def vector_avg(u, v):
   """
   Returns the component average between each vector
   @u: input vector u
@@ -368,33 +352,30 @@ def vector_avg (u, v):
     w[i] = (u[i] + v[i]) / 2
   return tuple(w)
 
-
 def argmin(sequence, vals):
-
   """
   Returns the argmin of sequence, where vals is the mapping of the sequence
   @sequence: a list of vars that map to vals
   @vals: the vals of the sequence
   example: argmin( ('x','y','z'), [2,3,1] ) returns 'z'
   """
-
   return sequence[ vals.index(min(vals)) ]
 
 def merge_filters(filter_1, filter_2, grad=0.5):
-    """
-    Merges two filters with some gradient and returns result.
-    e.g.: grad = 0.3 means 30% of filter 1 and 70% of filter 2
-    """
-    return filter_1
+  """
+  Merges two filters with some gradient and returns result.
+  e.g.: grad = 0.3 means 30% of filter 1 and 70% of filter 2
+  """
+  return filter_1
 
 def saliency_filter(input_img):
-    """
-    Computes a saliency filter over the input_img and returns result
-    """
-    pass
+  """
+  Computes a saliency filter over the input_img and returns result
+  """
+  sm = SaliencyMap(input_img)
+  return sm.map
 
 def CAIS(input_img, resolution, output, mark):
-
   """
   The main controller method
   @input_img: the file name of the input_img
