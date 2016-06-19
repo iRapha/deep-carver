@@ -2,7 +2,7 @@
 CAIS.py
 An implementation of the Seam Carving / Content Aware Imaging Scaling algorithm.
 
-Dependencies: 
+Dependencies:
 Scipy, Numpy, and Python Imaging Library
 
 Summary of methods:
@@ -10,8 +10,8 @@ print_fn(s) prints s to the terminal only when the verbose option is selected
 grayscale_filter(img) returns a grayscale version of an Image object img
 slow_gradient_filter(img) returns the Sobel Operator applied to img (slow implementation)
 gradient_filter(img) returns the Sobel Operator applied to img (fast implementation)
-img_transpose(img) returns the transpose of an Image object img 
-find_horizontal_seam(img) finds the lowest energy horizontal path in a grayscale image 
+img_transpose(img) returns the transpose of an Image object img
+find_horizontal_seam(img) finds the lowest energy horizontal path in a grayscale image
 find_vertical_seam(img) finds the lowest energy vertical path in a grayscale image
 mark_seam(img, path) marks all the pixels in path on img in white
 delete_vertical_seam(img, path) removes all the pixels in a vertical path from img
@@ -19,7 +19,7 @@ delete_horizontal_seam(img, path) removes all the pixels in a horizontal path fr
 add_vertical_seam(img, path) adds the average of the pixels near vertical path to img
 add_horizontal_seam(img, path) adds the average of the pixels near horizontal path to img
 vector_avg(u,v) returns the component average of two vectors u, v
-CAIS(input_img, resolution, output_img, mark) is the controller method 
+CAIS(input_img, resolution, output_img, mark) is the controller method
 
 Copyright (c) 2010, Sameep Tandon
 All rights reserved.
@@ -54,32 +54,32 @@ import sys
 
 
 inf = 1e1000
-verbose = False 
+verbose = False
 
 def print_fn( s ):
-  
+
   """
   prints diagnostic messages if the verbose option has been enabled
   @s: string s to print
   """
-  
+
   global verbose
   if verbose:
     print s
 
 def grayscale_filter ( img ):
-  
-  """ 
+
+  """
   Takes an image and returns a grayscale image using floats
   @img: the input img
   """
   return img.convert("F")
-  
+
 def slow_gradient_filter ( img ):
-  
-  """ 
-  Takes a grayscale img and returns the magnitude of the gradient operator on the image. Implements the Sobel operator. 
-  See http://en.wikipedia.org/wiki/Sobel_operator for details on the Sobel operator 
+
+  """
+  Takes a grayscale img and returns the magnitude of the gradient operator on the image. Implements the Sobel operator.
+  See http://en.wikipedia.org/wiki/Sobel_operator for details on the Sobel operator
   @img: a grayscale image represented in floats
   """
   gradient = Image.new("F", img.size, 0.0)
@@ -91,65 +91,65 @@ def slow_gradient_filter ( img ):
       dx_pos = 4 * input[x,y] - 2 * input[x-1,y] - input[x-1,y+1] - input[x-1,y-1]
       dx_neg = 4 * input[x,y] - 2 * input[x+1,y] - input[x+1,y+1] - input[x+1,y-1]
       dx = dx_pos - dx_neg
-    
+
       dy_pos = 4 * input[x,y] - 2 * input[x,y-1] - input[x+1,y-1] - input[x-1,y-1]
       dy_neg = 4 * input[x,y] - 2 * input[x,y+1] - input[x+1,y+1] - input[x-1,y+1]
       dy = dy_pos - dy_neg
-      
+
       output[x,y] = fabs(dx) + fabs(dy)
-      
+
   return gradient
 def gradient_filter ( im ):
-  
+
   """
   Takes a grayscale img and retuns the Sobel operator on the image. Fast thanks to Scipy/Numpy. See slow_gradient_filter for
   an implementation of what the Sobel operator is doing
   @im: a grayscale image represented in floats
   """
   print_fn("Computing energy function using the Sobel operator")
-  im_width, im_height = im.size 
+  im_width, im_height = im.size
   im_arr = numpy.reshape( im.getdata( ), (im_height, im_width) )
   sobel_arr = generic_gradient_magnitude( im, derivative=sobel )
   gradient = Image.new("F", im.size)
   gradient.putdata( list( sobel_arr.flat ) )
   return gradient
-  
+
 def img_transpose(im):
-  
-  """ 
+
+  """
   Returns the transpose of the Image object
   @img: input image
   """
-  
+
   im_width, im_height = im.size
-  cost = numpy.zeros( im.size ) 
+  cost = numpy.zeros( im.size )
   im_arr = numpy.reshape( im.getdata( ), (im_height, im_width) )
   im_arr = numpy.transpose(im_arr)
-  im = Image.new(im.mode, (im_height, im_width) ) 
+  im = Image.new(im.mode, (im_height, im_width) )
   im.putdata( list( im_arr.flat) )
   return im
-  
-  
+
+
 def find_horizontal_seam ( im ):
-  
+
   """
-  Takes a grayscale img and returns the lowest energy horizontal seam as a list of pixels (2-tuples). 
+  Takes a grayscale img and returns the lowest energy horizontal seam as a list of pixels (2-tuples).
   This implements the dynamic programming seam-find algorithm. For an m*n picture, this algorithm
-  takes O(m*n) time 
+  takes O(m*n) time
   @im: a grayscale image
   """
-  
+
   im_width, im_height = im.size
-  
+
   cost = numpy.zeros( im.size )
-  
+
   im_arr = numpy.reshape( im.getdata( ), (im_height, im_width) )
   im_arr = numpy.transpose(im_arr)
   for y in range(im_height):
     cost[0,y] = im_arr[0, y]
-  
+
   print_fn( "Starting Seam Calculations..." )
-    
+
   for x in range(1, im_width):
     if x % 200 == 0:
       print_fn( x )
@@ -162,30 +162,30 @@ def find_horizontal_seam ( im ):
       else:
         min_val = min( cost[x-1,y], cost[x-1,y-1] )
       cost[x,y] = im_arr[x,y] + min_val
-      
+
   print_fn( "Reconstructing Seam Path..." )
   min_val = inf
   path = [ ]
-  
+
   for y in range(im_height):
     if cost[im_width-1,y] < min_val:
       min_val = cost[im_width-1,y]
-      min_ptr = y 
-      
+      min_ptr = y
+
   pos = (im_width-1,min_ptr)
-  path.append(pos) 
-  
+  path.append(pos)
+
   while pos[0] != 0:
     val = cost[pos] - im_arr[pos]
     x,y = pos
     if y == 0:
       if val == cost[x-1,y+1]:
-        pos = (x-1,y+1) 
+        pos = (x-1,y+1)
       else:
         pos = (x-1,y)
     elif y < im_height - 2:
       if val == cost[x-1,y+1]:
-        pos = (x-1,y+1) 
+        pos = (x-1,y+1)
       elif val == cost[x-1,y]:
         pos = (x-1,y)
       else:
@@ -194,22 +194,22 @@ def find_horizontal_seam ( im ):
       if val == cost[x-1,y]:
         pos = (x-1,y)
       else:
-        pos = (x-1,y-1) 
-    
+        pos = (x-1,y-1)
+
     path.append(pos)
-  
+
   print_fn( "Reconstruction Complete." )
   return path
-  
-def find_vertical_seam ( im ): 
-  
+
+def find_vertical_seam ( im ):
+
   """
-  Takes a grayscale img and returns the lowest energy vertical seam as a list of pixels (2-tuples). 
+  Takes a grayscale img and returns the lowest energy vertical seam as a list of pixels (2-tuples).
   This implements the dynamic programming seam-find algorithm. For an m*n picture, this algorithm
-  takes O(m*n) time 
+  takes O(m*n) time
   @im: a grayscale image
   """
-  
+
   im = img_transpose(im)
   u = find_horizontal_seam(im)
   for i in range(len(u)):
@@ -217,9 +217,9 @@ def find_vertical_seam ( im ):
     temp.reverse()
     u[i] = tuple(temp)
   return u
-  
+
 def mark_seam (img, path):
-  
+
   """
   Marks a seam for easy visual checking
   @img: an input img
@@ -228,19 +228,19 @@ def mark_seam (img, path):
   pix = img.load()
   path = flatten(path)
   print_fn( "Marking seam..." )
-  if img.mode == "RGB": 
+  if img.mode == "RGB":
     for pixel in path:
       pix[pixel] = (255,255,255)
   else:
     for pixel in path:
       pix[pixel] = 255
-  
-  print_fn( "Marking Complete." )   
+
+  print_fn( "Marking Complete." )
   return img
-      
+
 
 def delete_horizontal_seam (img, path):
-  
+
   """
   Deletes the pixels in a horizontal path from img
   @img: an input img
@@ -262,13 +262,13 @@ def delete_horizontal_seam (img, path):
         seen_set.add(x)
       else:
         output[x,y-1] = input[x,y]
-  
-  print_fn( "Deletion Complete." )      
+
+  print_fn( "Deletion Complete." )
   return i
-      
+
 
 def delete_vertical_seam (img, path):
-    
+
   """
   Deletes the pixels in a vertical path from img
   @img: an input img
@@ -290,10 +290,10 @@ def delete_vertical_seam (img, path):
         seen_set.add(y)
       else:
         output[x-1,y] = input[x,y]
-  
-  print_fn( "Deletion Complete." )    
+
+  print_fn( "Deletion Complete." )
   return i
-  
+
 def add_vertical_seam(img, path):
   """
   Adds the pixels in a vertical path from img
@@ -321,12 +321,12 @@ def add_vertical_seam(img, path):
           output[x+1,y] = vector_avg(input[x,y], input[x-1,y])
       else:
         output[x+1,y] = input[x,y]
-        
+
   print_fn( "Addition Complete." )
   return i
-  
+
 def add_horizontal_seam(img, path):
-  
+
   """
   Adds the pixels in a horizontal path from img
   @img: an input img
@@ -352,12 +352,12 @@ def add_horizontal_seam(img, path):
           output[x,y+1] = vector_avg(input[x,y], input[x,y-1])
       else:
         output[x,y+1] = input[x,y]
-        
+
   print_fn( "Addition Complete." )
-  return i    
-        
+  return i
+
 def vector_avg (u, v):
-  
+
   """
   Returns the component average between each vector
   @u: input vector u
@@ -367,8 +367,8 @@ def vector_avg (u, v):
   for i in range(len(u)):
     w[i] = (u[i] + v[i]) / 2
   return tuple(w)
-  
-  
+
+
 def argmin(sequence, vals):
 
   """
@@ -379,49 +379,74 @@ def argmin(sequence, vals):
   """
 
   return sequence[ vals.index(min(vals)) ]
-  
+
+def merge_filters(filter_1, filter_2, grad=0.5):
+    """
+    Merges two filters with some gradient and returns result.
+    e.g.: grad = 0.3 means 30% of filter 1 and 70% of filter 2
+    """
+    return filter_1
+
+def saliency_filter(input_img):
+    """
+    Computes a saliency filter over the input_img and returns result
+    """
+    pass
+
 def CAIS(input_img, resolution, output, mark):
-  
+
   """
   The main controller method
   @input_img: the file name of the input_img
   @resolution: the resolution to resize the image to
   @output: the file name of the output_img
-  @mark: Useful debugging feature to show which seams are being deleted 
+  @mark: Useful debugging feature to show which seams are being deleted
   """
-  
+
   input = Image.open(input_img)
   im_width, im_height = input.size
   marked = [ ]
 
   while im_width > resolution[0]:
-    u = find_vertical_seam(gradient_filter(grayscale_filter(input)))
+    u = find_vertical_seam(
+      merge_filters(
+        gradient_filter(grayscale_filter(input)),
+        saliency_filter(input)))
     if mark:
       marked.append(u)
     input = delete_vertical_seam(input, u)
     im_width = input.size[0]
-    
+
   while im_width < resolution[0]:
-    u = find_vertical_seam(gradient_filter(grayscale_filter(input)))
+    u = find_vertical_seam(
+      merge_filters(
+        gradient_filter(grayscale_filter(input)),
+        saliency_filter(input)))
     input = add_vertical_seam(input, u)
     im_width = input.size[0]
-        
+
   while im_height > resolution[1]:
-    v = find_horizontal_seam(gradient_filter(grayscale_filter(input)))
+    v = find_horizontal_seam(
+      merge_filters(
+        gradient_filter(grayscale_filter(input)),
+        saliency_filter(input)))
     if mark:
       marked.append(v)
     input = delete_horizontal_seam(input,v)
     im_height = input.size[1]
   while im_height < resolution[1]:
-    v = find_horizontal_seam(gradient_filter(grayscale_filter(input)))
+    v = find_horizontal_seam(
+      merge_filters(
+        gradient_filter(grayscale_filter(input)),
+        saliency_filter(input)))
     input = add_horizontal_seam(input,v)
     im_height = input.size[1]
-    
+
   input.save(output, "JPEG")
-  
+
   if mark and marked != [ ]:
     mark_seam(Image.open(input_img), marked).show( )
-    
+
 def flatten(lst):
   """
   Flattens a list of lists into one list
@@ -436,8 +461,8 @@ def flatten(lst):
 
 def main():
   from optparse import OptionParser
-  import os 
-  usage = "usage: %prog -i [input image] -r [width] [height] -o [output name] \n" 
+  import os
+  usage = "usage: %prog -i [input image] -r [width] [height] -o [output name] \n"
   usage+= "where [width] and [height] are the resolution of the new image"
   parser = OptionParser(usage=usage)
   parser.add_option("-i", "--image", dest="input_image", help="Input Image File")
@@ -460,16 +485,16 @@ def main():
     mark = True
   else:
     mark = False
-  try: 
+  try:
     input_image = options.input_image
     resolution = ( int(options.resolution[0]), int(options.resolution[1]) )
   except:
     print "Incorrect Usage; please see python CAIS.py --help"
     sys.exit(2)
-    
+
   CAIS(input_image, resolution, output, mark)
-  
+
 
 if __name__ == "__main__":
   main()
-  
+
