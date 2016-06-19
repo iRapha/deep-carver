@@ -31,12 +31,34 @@
         <p>So we are tyring to fix it with machine learning</p>
         <p>So we are using machine learning to fix this without human intervention</p>
         <h1>Can I see an example?</h1>
+        <h3>Original <span style="float:right;">Scaled (Normal)</span></h3>
+        <div>
+          <img src="{{url_for('static', filename='plane/og.jpg')}}" alt="" />
+          <img style="float:right;" src="{{url_for('static', filename='plane/sc.jpg')}}" alt="" />
+        </div>
+        <h3>Saliency map <span style="float:right;">Scaled (Our way)</span></h3>
+        <div>
+          <img src="{{url_for('static', filename='plane/sm.jpg')}}" alt="" />
+          <img style="float:right;" src="{{url_for('static', filename='plane/scsm.jpg')}}" alt="" />
+        </div>
+
+        <h3>Original <span style="float:right;">Scaled (Normal)</span></h3>
+        <div>
+          <img style="height:400px;" src="{{url_for('static', filename='jump/og.jpg')}}" alt="" />
+          <img style="float:right; height:400px;" src="{{url_for('static', filename='jump/sc.jpg')}}" alt="" />
+        </div>
+        <h3>Saliency map <span style="float:right;">Scaled (Our way)</span></h3>
+        <div>
+          <img style="height:400px;" src="{{url_for('static', filename='jump/sm.jpg')}}" alt="" />
+          <img style="float:right; height:400px;" src="{{url_for('static', filename='jump/scsm.jpg')}}" alt="" />
+        </div>
+
       </div>
       <div class="col-md-2"></div>
     </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.0.0.min.js" integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 </body>
 </html>
