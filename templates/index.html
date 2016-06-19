@@ -1,18 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>DeepCarver</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  </head>
-  <body class="container-fluid">
-    <h1>Deep Carver</h1>
-    <small>We carve your pics while you relax</small>
+<head>
+  <meta charset="UTF-8">
+  <title>DeepCarver</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/index.css') }}">
+</head>
+<body>
 
+  <!-- <div class="container-fluid">
+    <img src="{{url_for('static', filename='deep.png')}}" alt="logo" id="logoPicture"  />
+  </div> -->
+  <div class="container-fluid" style="padding-top:15px;">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <img src="{{url_for('static', filename='deep.png')}}" alt="logo" id="logoPicture" class="center-block"  />
+        <h1>What it is</h1>
+        <p>Deep Carver brings machine learning to seam carving</p>
+        <h1>But what is Seam Carving?</h1>
+        <p>Its the algorithm that PhotoShoop uses for content aware scaling.</p>
+        <p>The algorithm recognizes seams in the image that seem similar to their neighbors and then removes them to give a more seamless (pun intended) result when scaling.</p>
+        <div>
+          <div style="max-width: 500px;" id="_giphy_a4fshusiRPDRm"></div><script>var _giphy = _giphy || []; _giphy.push({id: "a4fshusiRPDRm",w: 480, h: 320, clickthrough_url: "https://giphy.com/gifs/a4fshusiRPDRm"});var g = document.createElement("script"); g.type = "text/javascript"; g.async = true;g.src = ("https:" == document.location.protocol ? "https://" : "http://") + "giphy.com/static/js/widgets/embed.js";var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(g, s);</script>
+        </div>
+        <h1>So what did you do?</h1>
+        <p>Seam carving isn't perfect, sometimes things like faces can be targeted as unimportant seams which can lead to unintended results.</p>
+        <p>So we are tyring to fix it with machine learning</p>
+        <p>So we are using machine learning to fix this without human intervention</p>
+        <h1>Can I see an example?</h1>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+  </div>
 
-    <script src="https://code.jquery.com/jquery-3.0.0.min.js" integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
-  </body>
+  <script src="https://code.jquery.com/jquery-3.0.0.min.js" integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+</body>
 </html>
