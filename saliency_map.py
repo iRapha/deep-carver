@@ -112,6 +112,7 @@ class ConspicuityMap:
 
 class SaliencyMap:
     def __init__(self, src):
+        src = np.array(src)
         self.gp = GaussianPyramid(src)
         self.fm = FeatureMap(self.gp.maps)
         self.cm = ConspicuityMap(self.fm.maps)

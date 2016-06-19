@@ -53,6 +53,9 @@ from math import fabs
 import sys
 from saliency_map import SaliencyMap
 from utils import OpencvIo
+from matplotlib import cm
+import matplotlib.pyplot as plt
+from cv2 import addWeighted
 
 io = OpencvIo()
 
@@ -363,12 +366,16 @@ def argmin(sequence, vals):
   """
   return sequence[ vals.index(min(vals)) ]
 
-def merge_filters(filter_1, filter_2, grad=0.5):
+def merge_filters(filter_1, filter_2, grad=0.8):
   """
   Merges two filters with some gradient and returns result.
   e.g.: grad = 0.3 means 30% of filter 1 and 70% of filter 2
   """
-  return filter_1
+  # convert back to PIL Image from numpy array
+  mode_saved = filter_1.mode
+  filter_2 = Image.fromarray(numpy.uint8(cm.gist_earth(filter_2)*255))
+  im = Image.blend(filter_1.convert(filter_2.mode), filter_2, grad)
+  return im.convert(mode_saved)
 
 def saliency_filter(input_img):
   """
