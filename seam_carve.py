@@ -55,7 +55,7 @@ from saliency_map import SaliencyMap
 from utils import OpencvIo
 from matplotlib import cm
 import matplotlib.pyplot as plt
-from cv2 import addWeighted
+import cv2
 
 io = OpencvIo()
 
@@ -70,6 +70,12 @@ def print_fn(s):
   global verbose
   if verbose:
     print s
+
+def resize(input_img, resolution, output): #resolution is a tuple
+  image = Image.open(input_img)
+  resized = cv2.resize(image, resolution)
+  resized.save(output, "JPEG")
+
 
 def grayscale_filter(img):
   """
