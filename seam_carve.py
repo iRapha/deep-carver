@@ -72,7 +72,7 @@ def print_fn(s):
     print s
 
 def resize(input_img, resolution, output): #resolution is a tuple
-  image = Image.open(input_img)
+  image = cv2.imread(input_img)
   resized = cv2.resize(image, resolution)
   resized.save(output, "JPEG")
 
