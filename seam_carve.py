@@ -406,7 +406,7 @@ def CAIS(input_img, resolution, output, mark, options=None):
   @mark: Useful debugging feature to show which seams are being deleted
   """
 
-  input = Image.open(input_img)
+  input = cv2.imread(input_img)
   im_width, im_height = input.size
   marked = [ ]
 
@@ -442,7 +442,7 @@ def CAIS(input_img, resolution, output, mark, options=None):
   input.save(output, "JPEG")
 
   if mark and marked != [ ]:
-    mark_seam(Image.open(input_img), marked).show( )
+    mark_seam(cv2.imread(input_img), marked).show( )
 
 def flatten(lst):
   """
